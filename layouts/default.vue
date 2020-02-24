@@ -1,6 +1,14 @@
 <template>
-  <div>
-    <nuxt />
+  <div class="app-layout">
+    <div class="sideber">
+      <p>チャンネル一覧</p>
+      <p>#general</p>
+      <p>#random</p>
+      <p>#random</p>
+    </div>
+    <div class="main-content">
+      <nuxt />
+    </div>
   </div>
 </template>
 
@@ -52,4 +60,27 @@ html {
   color: #fff;
   background-color: #35495e;
 }
+
+.app-layout {
+  display: flex;
+}
+
+.sideber {
+  width: 300px;
+  background-color: #4A4141;
+  height: 100vh;
+  padding: 20px;
+}
+
+.sideber p {
+  color: #DDDDDD;
+  padding-top: 4px;
+}
+
+.main-content {
+  width: 100%;
+  background-color: #F1F1F1;
+  height: 100vh;
+}
+
 </style>
