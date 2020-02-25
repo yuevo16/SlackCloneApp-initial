@@ -2,15 +2,39 @@
   <div class="app-layout">
     <div class="sideber">
       <p>チャンネル一覧</p>
-      <p>#general</p>
-      <p>#random</p>
-      <p>#random</p>
+      <p v-for="channel in channels">
+        <nuxt-link :to="`/channels/${channel.id}`">{{ channel.name }}</nuxt-link>
+      </p>
     </div>
     <div class="main-content">
       <nuxt />
     </div>
   </div>
 </template>
+
+<script>
+//データベースの情報を取得する
+import { db } from '~/plugins/firebase'
+
+export default {
+  data () {
+    return {
+      channels: []
+    }
+  },
+  mounted () {
+    //全てのdocを取得するのでcollection idを指定するだけでOK
+    db.collection('channels').get()
+      .then((querySnapshot) => {
+        //作られたdocの数だけ繰り返し生成される
+        querySnapshot.forEach((doc) => {
+          //pushする段階でidを入れておくようにする
+          this.channels.push({id: doc.id, ...doc.data()})
+        })
+      })
+  }
+}
+</script>
 
 <style>
 html {
