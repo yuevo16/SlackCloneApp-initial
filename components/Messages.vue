@@ -11,9 +11,6 @@ export default {
   props: ['messages'],
   components: {
     Message
-  },
-  mounted () {
-    console.log(this.messages)
   }
 }
 </script>
