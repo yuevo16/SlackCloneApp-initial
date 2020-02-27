@@ -1,6 +1,8 @@
 <template>
   <div class="input-container">
-    <textarea v-model="text" v-on:click="openLoginModel" v-on:keydown.enter="addMessage"></textarea>
+    <img v-if="isAuthenticated" :src="user.photoURL" class="avatar">
+    <textarea v-model="text" v-if="isAuthenticated" v-on:keydown.enter="addMessage"></textarea>
+    <textarea v-model="text" v-else v-on:click="openLoginModal"></textarea>
     <el-dialog
       title=""
       :visible.sync="dialogVisible"
@@ -15,6 +17,7 @@
 <script>
 import { db, firebase } from '~/plugins/firebase'
 import Vue from 'vue'
+import { mapActions } from 'vuex'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 Vue.use(ElementUI)
@@ -26,8 +29,17 @@ export default {
       text: null
       }
     },
+    computed: {
+      user() {
+        return this.$store.state.user
+      },
+      isAuthenticated() {
+        return this.$store.getters.isAuthenticated
+      }
+    },
     methods: {
-      openLoginModel () {
+      ...mapActions(['setUser']),
+      openLoginModal () {
         this.dialogVisible = true
       },
       addMessage(event) {
@@ -35,7 +47,11 @@ export default {
         const channelId = this.$route.params.id
         db.collection('channels').doc(channelId).collection('messages').add({
           text: this.text,
-          createdAt: new Date().getTime()
+          createdAt: new Date().getTime(),
+          user: {
+            name: this.user.displayName,
+            thumbnail: this.user.photoURL
+          }
         }).then(() => {
           this.text = null
         })
@@ -47,12 +63,11 @@ export default {
       login() {
         const provider = new firebase.auth.GoogleAuthProvider()
         firebase.auth().signInWithPopup(provider)
-          //ログインした時の処理
           .then((result) => {
             const user = result.user
+            this.setUser(user)
             this.dialogVisible = false
-            console.log(user)
-          }).chatch((error) => {
+          }).catch((error) => {
             window.alert(error)
           })
       }
@@ -64,9 +79,16 @@ export default {
 .input-container {
   padding: 10px;
   height: 100%;
+  display: flex;
+}
+
+.avatar {
+  height: 100%;
+  width: auto;
 }
 
 textarea {
+  font-size: 1.5em;
   width: 100%;
   height: 100%;
 }
